@@ -2,17 +2,40 @@ name: tests
 
 on:
   push:
-    branches:
-      - develop
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  ci:
+  tests:
     runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: testing
+          MARIADB_USER: sail
+          MARIADB_PASSWORD: password
+          MARIADB_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_CONNECTION: mariadb
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: sail
+      DB_PASSWORD: password
 
     steps:
       - name: Checkout
@@ -21,9 +44,10 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: '8.5'
+          extensions: mbstring, pdo_mysql
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -31,26 +55,21 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install Node Dependencies
+      - name: Install Node dependencies
         run: npm ci
 
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
-
-      - name: Install Dependencies
+      - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Copy Environment File
-        run: cp .env.example .env
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Generate Application Key
-        run: php artisan key:generate
+      - name: Build assets
+        run: |
+          php artisan ziggy:generate
+          npm run build
 
-      - name: Publish Ziggy Configuration
-        run: php artisan ziggy:generate
-
-      - name: Build Assets
-        run: npm run build
-
-      - name: Tests
-        run: ./vendor/bin/phpunit
+      - name: Run tests
+        run: ./vendor/bin/pest
