@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Customer extends Model
 {
     protected $fillable = [
-    'name',
-    'vat_number',
-    'tax_office',
-    'country',
-    'street',
-    'street_number',
-    'postal_code',
-    'city',
-    'email',
-    'phone',
-];
+        'name',
+        'vat_number',
+        'tax_office',
+        'country',
+        'street',
+        'street_number',
+        'postal_code',
+        'city',
+        'email',
+        'phone',
+    ];
 
     public function company(): BelongsTo
     {
