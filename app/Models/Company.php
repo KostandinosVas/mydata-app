@@ -8,16 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Company extends Model
 {
     protected $fillable = [
-    'name',
-    'vat_number',
-    'tax_office',
-    'street',
-    'street_number',
-    'postal_code',
-    'city',
-    'country',
-    'aade_user_id',
-    'aade_subscription_key',
+        'name',
+        'vat_number',
+        'tax_office',
+        'street',
+        'street_number',
+        'postal_code',
+        'city',
+        'country',
+        'aade_user_id',
+        'aade_subscription_key',
     ];
 
     protected $hidden = [

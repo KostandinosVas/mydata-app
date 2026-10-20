@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Enums\VatCategory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
     protected $fillable = [
-    'name',
-    'description',
-    'unit_price',
-    'vat_category',
-];
+        'name',
+        'description',
+        'unit_price',
+        'vat_category',
+    ];
 
     protected function casts(): array
     {
